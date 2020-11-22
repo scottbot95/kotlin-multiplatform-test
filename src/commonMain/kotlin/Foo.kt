@@ -1,9 +1,10 @@
-interface Foo {
-    fun foo()
-}
+typealias FooConstructor<T, U> = (value: T) -> U
 
-interface DefaultFoo: Foo {
-    override fun foo() = Unit
-}
+open class ValueWrapper<T>(val value: T)
 
-class FooImpl: DefaultFoo, Foo
+
+class FooContainer<T> {
+    private fun <U : ValueWrapper<T>> callCtor(value: T, constructor: FooConstructor<T, U>): U = constructor(value)
+    fun ctorCallLambda(value: T) = callCtor(value) { ValueWrapper(value) } // WORKS
+    fun ctorCallReference(value: T) = callCtor(value, ::ValueWrapper) // EXPLODES
+}
